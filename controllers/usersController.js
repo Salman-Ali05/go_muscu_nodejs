@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');
 const User = require('../models/User');
 
 // Obtenir tous les utilisateurs
@@ -10,15 +11,45 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
-// Ajouter un nouvel utilisateur
+// Ajouter un nouvel utilisateur avec hachage du mot de passe
 exports.createUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-    const newUser = new User({ name, email, password });
+
+    // Vérification des champs obligatoires
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: 'Tous les champs sont obligatoires' });
+    }
+
+    // Vérifier si l'email existe déjà
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Cet email est déjà utilisé' });
+    }
+
+    // Hachage du mot de passe
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Création du nouvel utilisateur avec le mot de passe haché
+    const newUser = new User({
+      name,
+      email,
+      password: hashedPassword, // Utilisation du mot de passe haché
+    });
+
+    // Sauvegarder l'utilisateur dans la base de données
     await newUser.save();
-    res.status(201).json({ message: 'Utilisateur créé avec succès', user: newUser });
+
+    res.status(201).json({
+      message: 'Utilisateur créé avec succès',
+      user: { id: newUser._id, name: newUser.name, email: newUser.email }, // Pas de mot de passe dans la réponse
+    });
   } catch (err) {
-    res.status(400).json({ message: 'Erreur lors de la création de l’utilisateur', error: err.message });
+    res.status(400).json({
+      message: 'Erreur lors de la création de l’utilisateur',
+      error: err.message,
+    });
   }
 };
 
