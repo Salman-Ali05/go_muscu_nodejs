@@ -14,10 +14,10 @@ exports.getAllUsers = async (req, res) => {
 // Ajouter un nouvel utilisateur avec hachage du mot de passe
 exports.createUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, birthdate } = req.body;
 
     // Vérification des champs obligatoires
-    if (!name || !email || !password) {
+    if (!name || !email || !password, !birthdate) {
       return res.status(400).json({ message: 'Tous les champs sont obligatoires' });
     }
 
@@ -36,6 +36,7 @@ exports.createUser = async (req, res) => {
       name,
       email,
       password: hashedPassword, // Utilisation du mot de passe haché
+      birthdate
     });
 
     // Sauvegarder l'utilisateur dans la base de données
