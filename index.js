@@ -5,6 +5,7 @@ const authRoutes = require('./routes/authRoutes'); // Import des routes d'authen
 const programRoutes = require('./routes/programsRoutes');
 const exerciseRoutes = require('./routes/exerciseRoutes');
 const muscleRoutes = require('./routes/muscleRoute');
+const userPerfRoutes = require ('./routes/userPerfRoutes');
 const app = express();
 const PORT = 3000;
 
@@ -26,6 +27,7 @@ app.use('/api/auth', authRoutes); // Ajoutez cette ligne pour l'authentification
 app.use('/api/programs', programRoutes); // Ajouter les routes pour programs
 app.use('/api/exercises', exerciseRoutes); // Ajouter les routes pour exercises
 app.use('/api/muscles', muscleRoutes); // Ajouter les routes pour muscles
+app.use('/api/user-perfs', userPerfRoutes); // Ajouter les routes pour user performances
 
 // Lancer le serveur
 app.listen(PORT, () => {
