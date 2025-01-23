@@ -15,6 +15,11 @@ const programSchema = new mongoose.Schema({
       ref: 'Exercise', // Modèle référencé
     },
   ],
+  userID: {
+      type: mongoose.Schema.Types.ObjectId, // Référence à l'utilisateur
+      ref: 'User', // Modèle User référencé
+      required: true, // Obligatoire
+    },
   createdAt: {
     type: Date,
     default: Date.now, // Date de création automatique

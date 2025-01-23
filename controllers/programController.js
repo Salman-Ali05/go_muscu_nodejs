@@ -13,7 +13,7 @@ exports.getAllPrograms = async (req, res) => {
 // Ajouter un programme
 exports.createProgram = async (req, res) => {
     try {
-        const { name, description, exercises } = req.body;
+        const { name, description, exercises, userID } = req.body;
 
         // Validation des champs
         if (!name || !description) {
@@ -24,6 +24,7 @@ exports.createProgram = async (req, res) => {
             name,
             description,
             exercises,
+            userID,
         });
 
         await newProgram.save();
