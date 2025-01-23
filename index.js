@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const userRoutes = require('./routes/usersRoutes');
 const authRoutes = require('./routes/authRoutes'); // Import des routes d'authentification
 const programRoutes = require('./routes/programsRoutes');
+const exerciseRoutes = require('./routes/exerciseRoutes');
+const muscleRoutes = require('./routes/muscleRoute');
 const app = express();
 const PORT = 3000;
 
@@ -22,6 +24,8 @@ mongoose
 app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes); // Ajoutez cette ligne pour l'authentification
 app.use('/api/programs', programRoutes); // Ajouter les routes pour programs
+app.use('/api/exercises', exerciseRoutes); // Ajouter les routes pour exercises
+app.use('/api/muscles', muscleRoutes); // Ajouter les routes pour muscles
 
 // Lancer le serveur
 app.listen(PORT, () => {
