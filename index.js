@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const userRoutes = require('./routes/usersRoutes');
 const authRoutes = require('./routes/authRoutes'); // Import des routes d'authentification
+const programRoutes = require('./routes/programsRoutes');
 const app = express();
 const PORT = 3000;
 
@@ -20,6 +21,7 @@ mongoose
 // Routes principales
 app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes); // Ajoutez cette ligne pour l'authentification
+app.use('/api/programs', programRoutes); // Ajouter les routes pour programs
 
 // Lancer le serveur
 app.listen(PORT, () => {
