@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
-  programId: {
+  programID: {
       type: mongoose.Schema.Types.ObjectId, // Référence à l'utilisateur
       ref: 'Program', // Modèle User référencé
       required: true, // Obligatoire
