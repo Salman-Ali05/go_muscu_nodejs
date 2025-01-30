@@ -28,8 +28,8 @@ mongoose
     });
 
 // Routes principales
-app.use('/api/users', userRoutes); // Middleware spécifique à l'intérieur des routes
-app.use('/api/auth', authRoutes); // Authentification non protégée
+app.use('/api/users', userRoutes);
+app.use('/api/auth', authRoutes); 
 app.use('/api/programs', programRoutes);
 app.use('/api/exercises', exerciseRoutes);
 app.use('/api/muscles', muscleRoutes);

@@ -1,20 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const exerciseController = require('../controllers/exerciseController');
+const authenticate = require('../middlewares/authMiddleware');
 
 // Récupérer tous les exercices
-router.get('/', exerciseController.getAllExercises);
+router.get('/', authenticate, exerciseController.getAllExercises);
 
 // Ajouter un exercice
-router.post('/', exerciseController.createExercise);
+router.post('/', authenticate, exerciseController.createExercise);
 
 // Récupérer un exercice par ID
-router.get('/:id', exerciseController.getExerciseById);
+router.get('/:id', authenticate, exerciseController.getExerciseById);
 
 // Mettre à jour un exercice
-router.put('/:id', exerciseController.updateExercise);
+router.put('/:id', authenticate, exerciseController.updateExercise);
 
 // Supprimer un exercice
-router.delete('/:id', exerciseController.deleteExercise);
+router.delete('/:id', authenticate, exerciseController.deleteExercise);
 
 module.exports = router;
