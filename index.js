@@ -5,31 +5,46 @@ const authRoutes = require('./routes/authRoutes'); // Import des routes d'authen
 const programRoutes = require('./routes/programsRoutes');
 const exerciseRoutes = require('./routes/exerciseRoutes');
 const muscleRoutes = require('./routes/muscleRoute');
-const userPerfRoutes = require ('./routes/userPerfRoutes');
+const userPerfRoutes = require('./routes/userPerfRoutes');
+require('dotenv').config(); // Charger les variables d'environnement
+
+// Création de l'application Express
 const app = express();
-const PORT = 3000;
 
 // Middleware pour analyser le JSON
 app.use(express.json());
 
-// Connexion à MongoDB
+// Connexion à MongoDB (Utilisation d'une URI distante pour MongoDB Atlas)
 mongoose
-    .connect('mongodb://127.0.0.1:27017/gomuscu_e5', {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
+    .connect(process.env.MONGO_URI)
+    .then(() => {
+        if (process.env.NODE_ENV !== 'production') {
+            console.log('Connecté à MongoDB Atlas 🚀');
+        }
     })
-    .then(() => console.log('Connecté à MongoDB (gomuscu_e5)'))
-    .catch((err) => console.error('Erreur de connexion à MongoDB :', err));
+    .catch((err) => {
+        console.error('Erreur de connexion à MongoDB :', err);
+        process.exit(1); // Arrêter l'application en cas d'erreur critique
+    });
 
 // Routes principales
 app.use('/api/users', userRoutes);
-app.use('/api/auth', authRoutes); // Ajoutez cette ligne pour l'authentification
-app.use('/api/programs', programRoutes); // Ajouter les routes pour programs
-app.use('/api/exercises', exerciseRoutes); // Ajouter les routes pour exercises
-app.use('/api/muscles', muscleRoutes); // Ajouter les routes pour muscles
-app.use('/api/user-perfs', userPerfRoutes); // Ajouter les routes pour user performances
+app.use('/api/auth', authRoutes);
+app.use('/api/programs', programRoutes);
+app.use('/api/exercises', exerciseRoutes);
+app.use('/api/muscles', muscleRoutes);
+app.use('/api/user-perfs', userPerfRoutes);
 
-// Lancer le serveur
-app.listen(PORT, () => {
-    console.log(`Serveur démarré sur http://localhost:${PORT}`);
+// Gestion des routes inexistantes
+app.use((req, res, next) => {
+    res.status(404).json({ error: 'Route non trouvée' });
 });
+
+// Gestion globale des erreurs
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ error: 'Erreur serveur interne' });
+});
+
+// Exporter l'application Express pour Vercel
+module.exports = app;
