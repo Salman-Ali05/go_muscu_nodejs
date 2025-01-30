@@ -6,7 +6,6 @@ const programRoutes = require('./routes/programsRoutes');
 const exerciseRoutes = require('./routes/exerciseRoutes');
 const muscleRoutes = require('./routes/muscleRoute');
 const userPerfRoutes = require('./routes/userPerfRoutes');
-const authenticate = require('./middlewares/authMiddleware'); // Import du middleware d'authentification
 require('dotenv').config(); // Charger les variables d'environnement
 
 // Création de l'application Express
@@ -28,16 +27,8 @@ mongoose
         process.exit(1); // Arrêter l'application en cas d'erreur critique
     });
 
-// Appliquer le middleware globalement sauf pour les routes d'authentification
-app.use((req, res, next) => {
-    if (req.path.startsWith('/api/auth')) {
-        return next(); // Ne pas protéger les routes d'authentification
-    }
-    authenticate(req, res, next); // Protéger toutes les autres routes
-});
-
 // Routes principales
-app.use('/api/users', userRoutes);
+app.use('/api/users', userRoutes); // Middleware spécifique à l'intérieur des routes
 app.use('/api/auth', authRoutes); // Authentification non protégée
 app.use('/api/programs', programRoutes);
 app.use('/api/exercises', exerciseRoutes);
