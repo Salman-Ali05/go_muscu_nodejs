@@ -13,18 +13,18 @@ exports.getAllPrograms = async (req, res) => {
 // Ajouter un programme
 exports.createProgram = async (req, res) => {
     try {
-        const { name, description, exercises, userID } = req.body;
+        const { name, description, exercises } = req.body;
 
         // Validation des champs
         if (!name || !description) {
             return res.status(400).json({ message: 'Nom et description sont obligatoires.' });
         }
 
+        // Créer un nouveau programme
         const newProgram = new Program({
             name,
             description,
             exercises,
-            userID,
         });
 
         await newProgram.save();
@@ -38,6 +38,12 @@ exports.createProgram = async (req, res) => {
 exports.getProgramById = async (req, res) => {
     try {
         const { id } = req.params;
+
+        // Vérifie si l'ID est valide
+        if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+            return res.status(400).json({ message: 'ID invalide.' });
+        }
+
         const program = await Program.findById(id).populate('exercises');
 
         if (!program) {
@@ -56,10 +62,15 @@ exports.updateProgram = async (req, res) => {
         const { id } = req.params;
         const { name, description, exercises } = req.body;
 
+        // Vérifie si l'ID est valide
+        if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+            return res.status(400).json({ message: 'ID invalide.' });
+        }
+
         const updatedProgram = await Program.findByIdAndUpdate(
             id,
             { name, description, exercises, updatedAt: Date.now() },
-            { new: true } // Retourne le document mis à jour
+            { new: true, runValidators: true } // Retourne le document mis à jour et applique les validations
         );
 
         if (!updatedProgram) {
@@ -76,6 +87,11 @@ exports.updateProgram = async (req, res) => {
 exports.deleteProgram = async (req, res) => {
     try {
         const { id } = req.params;
+
+        // Vérifie si l'ID est valide
+        if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+            return res.status(400).json({ message: 'ID invalide.' });
+        }
 
         const deletedProgram = await Program.findByIdAndDelete(id);
 

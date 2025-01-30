@@ -18,15 +18,6 @@ const exerciseSchema = new mongoose.Schema({
     type: String,
     default: '', // Conseil optionnel
   },
-  rest: {
-    type: String, // Temps de repos en secondes
-    required: true, // Obligatoire
-    default: "60", // Par défaut 60 secondes
-  },
-  nbRep: {
-    type: Number, // Nombre de répétitions
-    required: true, // Obligatoire
-  },
   createdAt: {
     type: Date,
     default: Date.now, // Date de création automatique

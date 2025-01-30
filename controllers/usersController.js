@@ -1,23 +1,24 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
+const mongoose = require('mongoose');
 
 // Obtenir tous les utilisateurs
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.find();
+    const users = await User.find().select('-password'); // Exclut le mot de passe
     res.status(200).json(users);
   } catch (err) {
     res.status(500).json({ message: 'Erreur serveur', error: err.message });
   }
 };
 
-// Ajouter un nouvel utilisateur avec hachage du mot de passe
+// Ajouter un nouvel utilisateur
 exports.createUser = async (req, res) => {
   try {
-    const { name, email, password, birthdate } = req.body;
+    const { name, email, password, birthdate, programID } = req.body;
 
     // Vérification des champs obligatoires
-    if (!name || !email || !password, !birthdate) {
+    if (!name || !email || !password || !birthdate) {
       return res.status(400).json({ message: 'Tous les champs sont obligatoires' });
     }
 
@@ -28,39 +29,42 @@ exports.createUser = async (req, res) => {
     }
 
     // Hachage du mot de passe
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Création du nouvel utilisateur avec le mot de passe haché
     const newUser = new User({
       name,
       email,
-      password: hashedPassword, // Utilisation du mot de passe haché
-      birthdate
+      password: hashedPassword,
+      birthdate,
+      programID
     });
 
-    // Sauvegarder l'utilisateur dans la base de données
     await newUser.save();
 
     res.status(201).json({
       message: 'Utilisateur créé avec succès',
-      user: { id: newUser._id, name: newUser.name, email: newUser.email }, // Pas de mot de passe dans la réponse
+      user: { id: newUser._id, name: newUser.name, email: newUser.email },
     });
   } catch (err) {
-    res.status(400).json({
-      message: 'Erreur lors de la création de l’utilisateur',
-      error: err.message,
-    });
+    res.status(400).json({ message: 'Erreur lors de la création de l’utilisateur', error: err.message });
   }
 };
 
 // Obtenir un utilisateur par ID
 exports.getUserById = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
+    const { id } = req.params;
+
+    // Validation de l'ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'ID invalide' });
+    }
+
+    const user = await User.findById(id).select('-password'); // Exclut le mot de passe
     if (!user) {
       return res.status(404).json({ message: 'Utilisateur non trouvé' });
     }
+
     res.status(200).json(user);
   } catch (err) {
     res.status(500).json({ message: 'Erreur serveur', error: err.message });
@@ -70,10 +74,18 @@ exports.getUserById = async (req, res) => {
 // Supprimer un utilisateur
 exports.deleteUser = async (req, res) => {
   try {
-    const user = await User.findByIdAndDelete(req.params.id);
+    const { id } = req.params;
+
+    // Validation de l'ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'ID invalide' });
+    }
+
+    const user = await User.findByIdAndDelete(id);
     if (!user) {
       return res.status(404).json({ message: 'Utilisateur non trouvé' });
     }
+
     res.status(200).json({ message: 'Utilisateur supprimé avec succès' });
   } catch (err) {
     res.status(500).json({ message: 'Erreur serveur', error: err.message });
