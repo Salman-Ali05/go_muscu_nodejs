@@ -18,7 +18,7 @@ exports.createUser = async (req, res) => {
     const { name, email, password, birthdate, programID } = req.body;
 
     // Vérification des champs obligatoires
-    if (!name || !email || !password || !birthdate) {
+    if (!name || !email || !password || !birthdate || !programID) {
       return res.status(400).json({ message: 'Tous les champs sont obligatoires' });
     }
 
