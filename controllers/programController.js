@@ -68,15 +68,23 @@ exports.updateProgram = async (req, res) => {
             return res.status(400).json({ message: 'ID invalide.' });
         }
 
-        const updatedProgram = await Program.findByIdAndUpdate(
-            id,
-            { name, description, exercises, updatedAt: Date.now() },
-            { new: true, runValidators: true } // Retourne le document mis à jour et applique les validations
-        );
-
-        if (!updatedProgram) {
+        // Récupérer le programme existant
+        const program = await Program.findById(id);
+        if (!program) {
             return res.status(404).json({ message: 'Programme non trouvé' });
         }
+
+        // Fusionner les exercices existants avec ceux fournis
+        if (exercises) {
+            program.exercises = [...new Set([...program.exercises, ...exercises])];
+        }
+
+        // Mettre à jour les autres champs si fournis
+        if (name) program.name = name;
+        if (description) program.description = description;
+
+        // Sauvegarder le programme mis à jour
+        const updatedProgram = await program.save();
 
         res.status(200).json({ message: 'Programme mis à jour avec succès', program: updatedProgram });
     } catch (err) {
