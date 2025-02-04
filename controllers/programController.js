@@ -13,7 +13,7 @@ exports.getAllPrograms = async (req, res) => {
 // Ajouter un programme (avec URL d'image)
 exports.createProgram = async (req, res) => {
     try {
-        const { name, description, exercises, nbRep, image } = req.body;
+        const { name, description, exercises, rest, nbRep, image } = req.body;
 
         // Validation des champs
         if (!name || !description || !nbRep) {
@@ -25,6 +25,7 @@ exports.createProgram = async (req, res) => {
             name,
             description,
             exercises,
+            rest,
             nbRep,
             image, // Stocke l'URL de l'image
         });
@@ -61,7 +62,7 @@ exports.getProgramById = async (req, res) => {
 exports.updateProgram = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, description, exercises, image } = req.body;
+        const { name, description, exercises, rest, image } = req.body;
 
         if (!id.match(/^[0-9a-fA-F]{24}$/)) {
             return res.status(400).json({ message: 'ID invalide.' });
@@ -75,6 +76,7 @@ exports.updateProgram = async (req, res) => {
         // Mise à jour des champs fournis
         if (name) program.name = name;
         if (description) program.description = description;
+        if (rest) program.rest = rest;
         if (exercises) {
             program.exercises = [...new Set([...program.exercises, ...exercises])];
         }
