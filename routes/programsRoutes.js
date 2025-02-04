@@ -4,7 +4,7 @@ const programController = require('../controllers/programController');
 const authenticate = require('../middlewares/authMiddleware');
 
 // Récupérer tous les programmes
-router.get('/', authenticate, programController.getAllPrograms);
+router.get('/', programController.getAllPrograms);
 
 // Ajouter un programme
 router.post('/', authenticate, programController.createProgram);

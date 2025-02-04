@@ -10,22 +10,23 @@ exports.getAllPrograms = async (req, res) => {
     }
 };
 
-// Ajouter un programme
+// Ajouter un programme (avec URL d'image)
 exports.createProgram = async (req, res) => {
     try {
-        const { name, description, exercises, nbRep } = req.body;
+        const { name, description, exercises, nbRep, image } = req.body;
 
         // Validation des champs
-        if (!name || !description, !nbRep) {
-            return res.status(400).json({ message: 'Nom et description sont obligatoires.' });
+        if (!name || !description || !nbRep) {
+            return res.status(400).json({ message: 'Nom, description et nbRep sont obligatoires.' });
         }
 
-        // Créer un nouveau programme
+        // Création du programme avec URL d'image
         const newProgram = new Program({
             name,
             description,
             exercises,
-            nbRep
+            nbRep,
+            image, // Stocke l'URL de l'image
         });
 
         await newProgram.save();
@@ -40,7 +41,6 @@ exports.getProgramById = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Vérifie si l'ID est valide
         if (!id.match(/^[0-9a-fA-F]{24}$/)) {
             return res.status(400).json({ message: 'ID invalide.' });
         }
@@ -57,33 +57,29 @@ exports.getProgramById = async (req, res) => {
     }
 };
 
-// Mettre à jour un programme
+// Mettre à jour un programme (avec URL d'image)
 exports.updateProgram = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, description, exercises } = req.body;
+        const { name, description, exercises, image } = req.body;
 
-        // Vérifie si l'ID est valide
         if (!id.match(/^[0-9a-fA-F]{24}$/)) {
             return res.status(400).json({ message: 'ID invalide.' });
         }
 
-        // Récupérer le programme existant
         const program = await Program.findById(id);
         if (!program) {
             return res.status(404).json({ message: 'Programme non trouvé' });
         }
 
-        // Fusionner les exercices existants avec ceux fournis
+        // Mise à jour des champs fournis
+        if (name) program.name = name;
+        if (description) program.description = description;
         if (exercises) {
             program.exercises = [...new Set([...program.exercises, ...exercises])];
         }
+        if (image) program.image = image; // Mise à jour de l'URL de l'image
 
-        // Mettre à jour les autres champs si fournis
-        if (name) program.name = name;
-        if (description) program.description = description;
-
-        // Sauvegarder le programme mis à jour
         const updatedProgram = await program.save();
 
         res.status(200).json({ message: 'Programme mis à jour avec succès', program: updatedProgram });
@@ -97,7 +93,6 @@ exports.deleteProgram = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Vérifie si l'ID est valide
         if (!id.match(/^[0-9a-fA-F]{24}$/)) {
             return res.status(400).json({ message: 'ID invalide.' });
         }
