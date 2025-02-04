@@ -1,6 +1,6 @@
 const Program = require('../models/Program');
 
-// Récupérer tous les programmes
+// ✅ Récupérer tous les programmes
 exports.getAllPrograms = async (req, res) => {
     try {
         const programs = await Program.find().populate('exercises');
@@ -10,24 +10,28 @@ exports.getAllPrograms = async (req, res) => {
     }
 };
 
-// Ajouter un programme (avec URL d'image)
+// ✅ Ajouter un programme (avec URL d'image)
 exports.createProgram = async (req, res) => {
     try {
-        const { name, description, exercises, rest, nbRep, image } = req.body;
+        const { name, description, exercises = [], rest, nbRep, image } = req.body;
 
-        // Validation des champs
+        // Validation des champs obligatoires
         if (!name || !description || !nbRep) {
             return res.status(400).json({ message: 'Nom, description et nbRep sont obligatoires.' });
         }
 
-        // Création du programme avec URL d'image
+        if (nbRep < 1) {
+            return res.status(400).json({ message: 'Le nombre de répétitions doit être au moins 1.' });
+        }
+
+        // Création du programme
         const newProgram = new Program({
             name,
             description,
             exercises,
-            rest,
+            rest: rest || "60", // Valeur par défaut si non fournie
             nbRep,
-            image, // Stocke l'URL de l'image
+            image: image || "", // Laisse vide si aucune image
         });
 
         await newProgram.save();
@@ -37,7 +41,7 @@ exports.createProgram = async (req, res) => {
     }
 };
 
-// Récupérer un programme par ID
+// ✅ Récupérer un programme par ID
 exports.getProgramById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -58,11 +62,11 @@ exports.getProgramById = async (req, res) => {
     }
 };
 
-// Mettre à jour un programme (avec URL d'image)
+// ✅ Mettre à jour un programme (avec URL d'image)
 exports.updateProgram = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, description, exercises, rest, image } = req.body;
+        const { name, description, exercises, rest, nbRep, image } = req.body;
 
         if (!id.match(/^[0-9a-fA-F]{24}$/)) {
             return res.status(400).json({ message: 'ID invalide.' });
@@ -73,14 +77,15 @@ exports.updateProgram = async (req, res) => {
             return res.status(404).json({ message: 'Programme non trouvé' });
         }
 
-        // Mise à jour des champs fournis
+        // Mise à jour des champs seulement si fournis
         if (name) program.name = name;
         if (description) program.description = description;
+        if (nbRep && nbRep >= 1) program.nbRep = nbRep;
         if (rest) program.rest = rest;
         if (exercises) {
-            program.exercises = [...new Set([...program.exercises, ...exercises])];
+            program.exercises = [...new Set([...program.exercises, ...exercises])]; // Évite les doublons
         }
-        if (image) program.image = image; // Mise à jour de l'URL de l'image
+        if (image) program.image = image;
 
         const updatedProgram = await program.save();
 
@@ -90,7 +95,7 @@ exports.updateProgram = async (req, res) => {
     }
 };
 
-// Supprimer un programme
+// ✅ Supprimer un programme
 exports.deleteProgram = async (req, res) => {
     try {
         const { id } = req.params;
