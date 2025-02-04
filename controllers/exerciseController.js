@@ -13,7 +13,7 @@ exports.getAllExercises = async (req, res) => {
 // Ajouter un exercice
 exports.createExercise = async (req, res) => {
   try {
-    const { name, muscleId, material, advice } = req.body;
+    const { name, muscleId, material, advice, image } = req.body;
 
     // Validation des champs obligatoires
     if (!name || !muscleId) {
@@ -25,6 +25,7 @@ exports.createExercise = async (req, res) => {
       muscleId,
       material,
       advice,
+      image: image || "", // Laisse vide si aucune image
     });
 
     await newExercise.save();
@@ -60,7 +61,7 @@ exports.getExerciseById = async (req, res) => {
 exports.updateExercise = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, muscleId, material, advice } = req.body;
+    const { name, material, advice, image } = req.body;
 
     // Validation de l'ID
     if (!id.match(/^[0-9a-fA-F]{24}$/)) {
@@ -69,13 +70,14 @@ exports.updateExercise = async (req, res) => {
 
     const updatedExercise = await Exercise.findByIdAndUpdate(
       id,
-      { name, muscleId, material, advice, updatedAt: Date.now() },
+      { name, material, advice, updatedAt: Date.now(), image },
       { new: true, runValidators: true } // Applique les validations et retourne le document mis à jour
     );
 
     if (!updatedExercise) {
       return res.status(404).json({ message: 'Exercice non trouvé' });
     }
+    if (image) program.image = image;
 
     res.status(200).json({ message: 'Exercice mis à jour avec succès', exercise: updatedExercise });
   } catch (err) {
