@@ -71,13 +71,12 @@ exports.updateExercise = async (req, res) => {
     const updatedExercise = await Exercise.findByIdAndUpdate(
       id,
       { name, material, advice, updatedAt: Date.now(), image },
-      { new: true, runValidators: true } // Applique les validations et retourne le document mis à jour
+      { new: true, runValidators: true } // Retourne le document mis à jour et applique les validations
     );
 
     if (!updatedExercise) {
       return res.status(404).json({ message: 'Exercice non trouvé' });
     }
-    if (image) program.image = image;
 
     res.status(200).json({ message: 'Exercice mis à jour avec succès', exercise: updatedExercise });
   } catch (err) {
