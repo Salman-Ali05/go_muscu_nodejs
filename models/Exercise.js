@@ -18,6 +18,10 @@ const exerciseSchema = new mongoose.Schema({
     type: String,
     default: '', // Conseil optionnel
   },
+  image: {
+    type: String, // Stocke l'URL de l'image
+    required: false, // Optionnel
+  },
   createdAt: {
     type: Date,
     default: Date.now, // Date de création automatique

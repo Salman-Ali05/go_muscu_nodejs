@@ -23,6 +23,10 @@ const programSchema = new mongoose.Schema({
   nbRep: {
     type: Number, // Nombre de répétitions
     required: true, // Obligatoire
+  }, 
+  image: {
+    type: String, // Stocke l'URL de l'image
+    required: false, // Optionnel
   },
   createdAt: {
     type: Date,
