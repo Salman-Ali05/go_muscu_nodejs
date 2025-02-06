@@ -87,7 +87,13 @@ exports.updateUser = async (req, res) => {
     const updatedFields = {};
     if (name) updatedFields.name = name;
     if (email) updatedFields.email = email;
-    if (password) updatedFields.password = password; // Pensez à hasher le mot de passe si nécessaire
+
+    // Si un mot de passe est fourni, le hacher avant de l'enregistrer
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      updatedFields.password = hashedPassword;
+    }
+
     if (birthdate) updatedFields.birthdate = birthdate;
     if (programID) updatedFields.programID = programID;
 
