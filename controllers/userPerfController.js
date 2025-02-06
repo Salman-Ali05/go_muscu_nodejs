@@ -1,12 +1,22 @@
 const UserPerf = require('../models/UserPerf');
 
-// Récupérer toutes les performances d'un utilisateur
 exports.getAllUserPerformances = async (req, res) => {
   try {
-    const { userId } = req.query;
+    const { userId } = req.params; // Récupérer l'ID de l'utilisateur depuis l'URL
 
-    const query = userId ? { userId } : {};
-    const performances = await UserPerf.find(query).populate('exerciseId userId');
+    // Vérifier que userId est fourni
+    if (!userId) {
+      return res.status(400).json({ message: "L'ID de l'utilisateur est requis." });
+    }
+
+    // Filtrer les performances par utilisateur
+    const performances = await UserPerf.find({ userId }).populate('exerciseId userId');
+
+    // Vérifier si l'utilisateur a des performances enregistrées
+    if (performances.length === 0) {
+      return res.status(404).json({ message: "Aucune performance trouvée pour cet utilisateur." });
+    }
+
     res.status(200).json(performances);
   } catch (err) {
     res.status(500).json({ message: 'Erreur serveur', error: err.message });

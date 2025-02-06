@@ -4,7 +4,7 @@ const userPerfController = require('../controllers/userPerfController');
 const authenticate = require('../middlewares/authMiddleware');
 
 // Récupérer toutes les performances (optionnellement par utilisateur)
-router.get('/',authenticate, userPerfController.getAllUserPerformances);
+router.get('/:userId', authenticate, userPerfController.getAllUserPerformances);
 
 // Ajouter une performance
 router.post('/',authenticate, userPerfController.createUserPerformance);
