@@ -75,7 +75,7 @@ exports.getUserById = async (req, res) => {
 exports.updateUser = async (req, res) => {
   try {
     const { id } = req.params; // ID de l'utilisateur à mettre à jour
-    const { name, email, password, birthdate, programID } = req.body; // Champs modifiables
+    const { name, email, oldPassword, newPassword, birthdate, programID } = req.body; // Champs modifiables
 
     // Vérifie si l'utilisateur existe
     const existingUser = await User.findById(id);
@@ -83,19 +83,30 @@ exports.updateUser = async (req, res) => {
       return res.status(404).json({ message: 'Utilisateur non trouvé' });
     }
 
+    // Vérifier l'ancien mot de passe si un nouveau est fourni
+    if (newPassword) {
+      if (!oldPassword) {
+        return res.status(400).json({ message: 'L\'ancien mot de passe est requis pour en définir un nouveau.' });
+      }
+
+      const isPasswordValid = await bcrypt.compare(oldPassword, existingUser.password);
+      if (!isPasswordValid) {
+        return res.status(401).json({ message: 'L\'ancien mot de passe est incorrect.' });
+      }
+    }
+
     // Mettre à jour uniquement les champs fournis dans la requête
     const updatedFields = {};
     if (name) updatedFields.name = name;
     if (email) updatedFields.email = email;
-
-    // Si un mot de passe est fourni, le hacher avant de l'enregistrer
-    if (password) {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      updatedFields.password = hashedPassword;
-    }
-
     if (birthdate) updatedFields.birthdate = birthdate;
     if (programID) updatedFields.programID = programID;
+
+    // Si un nouveau mot de passe est fourni, le hacher avant de l'enregistrer
+    if (newPassword) {
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      updatedFields.password = hashedPassword;
+    }
 
     // Mise à jour dans la base de données
     const updatedUser = await User.findByIdAndUpdate(
@@ -115,6 +126,7 @@ exports.updateUser = async (req, res) => {
     });
   }
 };
+
 
 // Supprimer un utilisateur
 exports.deleteUser = async (req, res) => {
