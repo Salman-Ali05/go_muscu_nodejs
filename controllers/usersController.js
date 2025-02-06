@@ -71,6 +71,45 @@ exports.getUserById = async (req, res) => {
   }
 };
 
+// Mettre à jour un user
+exports.updateUser = async (req, res) => {
+  try {
+    const { id } = req.params; // ID de l'utilisateur à mettre à jour
+    const { name, email, password, birthdate, programID } = req.body; // Champs modifiables
+
+    // Vérifie si l'utilisateur existe
+    const existingUser = await User.findById(id);
+    if (!existingUser) {
+      return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    }
+
+    // Mettre à jour uniquement les champs fournis dans la requête
+    const updatedFields = {};
+    if (name) updatedFields.name = name;
+    if (email) updatedFields.email = email;
+    if (password) updatedFields.password = password; // Pensez à hasher le mot de passe si nécessaire
+    if (birthdate) updatedFields.birthdate = birthdate;
+    if (programID) updatedFields.programID = programID;
+
+    // Mise à jour dans la base de données
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { $set: updatedFields },
+      { new: true, runValidators: true } // Retourne l'utilisateur mis à jour et applique les validateurs
+    );
+
+    res.status(200).json({
+      message: 'Utilisateur mis à jour avec succès',
+      user: updatedUser,
+    });
+  } catch (err) {
+    res.status(400).json({
+      message: 'Erreur lors de la mise à jour de l\'utilisateur',
+      error: err.message,
+    });
+  }
+};
+
 // Supprimer un utilisateur
 exports.deleteUser = async (req, res) => {
   try {

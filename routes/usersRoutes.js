@@ -9,6 +9,9 @@ router.get('/', authenticate, usersController.getAllUsers);
 // Route pour créer un utilisateur
 router.post('/', usersController.createUser);
 
+// Route pour créer un utilisateur
+router.put('/:id', authenticate, usersController.updateUser);
+
 // Route pour obtenir un utilisateur par ID
 router.get('/:id', authenticate, usersController.getUserById);
 
