@@ -1,6 +1,7 @@
-const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 // Obtenir tous les utilisateurs
 exports.getAllUsers = async (req, res) => {
@@ -13,10 +14,6 @@ exports.getAllUsers = async (req, res) => {
 };
 
 // Ajouter un nouvel utilisateur
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-
 exports.createUser = async (req, res) => {
   try {
     const { name, email, password, birthdate, programID } = req.body;
