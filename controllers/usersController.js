@@ -13,6 +13,10 @@ exports.getAllUsers = async (req, res) => {
 };
 
 // Ajouter un nouvel utilisateur
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+
 exports.createUser = async (req, res) => {
   try {
     const { name, email, password, birthdate, programID } = req.body;
@@ -31,6 +35,7 @@ exports.createUser = async (req, res) => {
     // Hachage du mot de passe
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Création du nouvel utilisateur
     const newUser = new User({
       name,
       email,
@@ -41,9 +46,24 @@ exports.createUser = async (req, res) => {
 
     await newUser.save();
 
+    // Génération du token JWT
+    const jwtSecret = process.env.JWT_SECRET || 'default_secret_key';
+    const token = jwt.sign(
+      { id: newUser._id, email: newUser.email },
+      jwtSecret,
+      { expiresIn: '1h' } // Expiration du token
+    );
+
     res.status(201).json({
       message: 'Utilisateur créé avec succès',
-      user: { id: newUser._id, name: newUser.name, email: newUser.email },
+      token, // Retourne le token JWT
+      user: {
+        id: newUser._id,
+        name: newUser.name,
+        email: newUser.email,
+        birthdate: newUser.birthdate,
+        programID: newUser.programID,
+      },
     });
   } catch (err) {
     res.status(400).json({ message: 'Erreur lors de la création de l’utilisateur', error: err.message });
